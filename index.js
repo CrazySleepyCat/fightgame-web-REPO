@@ -150,7 +150,7 @@ function spriteCollision(aggressor, victim) {
     )
 }
 
-let fightTimer = 3
+let fightTimer = 60
 function decreaseTimer() {
     if (fightTimer > 0) {
         setTimeout(decreaseTimer, 1000);
