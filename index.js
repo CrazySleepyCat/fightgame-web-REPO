@@ -149,28 +149,35 @@ function spriteCollision(aggressor, victim) {
         aggressor.attackBox.position.y <= victim.position.y + victim.height
     )
 }
+let gameEnded = false
+function determineWinner({ player, enemy, timerId }) {
+    clearTimeout(timerId)
+    document.querySelector("#resultDisplay").style.display = 'flex'
+    if (player.health > enemy.health) {
+        document.querySelector("#resultDisplay").innerHTML = 'P1 WINS'
+    } else if (player.health < enemy.health) {
+        document.querySelector("#resultDisplay").innerHTML = 'P2 WINS'
+    }
+    gameEnded = true
+}
 
 let fightTimer = 60
+let timerId
 function decreaseTimer() {
     if (fightTimer > 0) {
-        setTimeout(decreaseTimer, 1000);
+        timerId = setTimeout(decreaseTimer, 1000);
         fightTimer--
         document.querySelector('#timer').innerHTML = '' + fightTimer
     }
     if (fightTimer === 0) {
-        document.querySelector("#resultDisplay").style.display = 'flex'
-        if (player.health > enemy.health) {
-            document.querySelector("#resultDisplay").innerHTML = 'P1 WINS'
-        } else if (player.health < enemy.health) {
-            document.querySelector("#resultDisplay").innerHTML = 'P2 WINS'
-        }
+        determineWinner({ player, enemy, timerId })
     }
-    
+
 }
 
 
 function animate() {
-    window.requestAnimationFrame(animate)
+    if (!gameEnded) window.requestAnimationFrame(animate)
     c.fillStyle = '#2b2b2b'
     c.fillRect(0, 0, canvas.width, canvas.height)
     player.update()
@@ -203,6 +210,11 @@ function animate() {
         player.health -= 20
         document.querySelector('#p1hp').style.width = player.health + '%'
         enemy.isAttacking = false
+    }
+
+    // END GAME
+    if (player.health <= 0 || enemy.health <= 0) {
+        determineWinner({ player, enemy, timerId })
     }
 
 }
