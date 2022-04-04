@@ -175,51 +175,87 @@ function decreaseTimer() {
 
 }
 
+var stop = false;
+var frameCount = 0;
+var fps, fpsInterval, startTime, now, then, elapsed;
+
+
+// initialize the timer variables and start the animation
+
+function startAnimating(fps) {
+    fpsInterval = 1000 / fps;
+    then = Date.now();
+    startTime = then;
+    animate();
+}
 
 function animate() {
+
+    // request another frame
+
     if (!gameEnded) window.requestAnimationFrame(animate)
-    c.fillStyle = '#2b2b2b'
-    c.fillRect(0, 0, canvas.width, canvas.height)
-    player.update()
-    enemy.update()
 
-    //P1 move
-    player.velocity.x = 0
-    if (keys.player.a.pressed && player.lastKey == 'a') {
-        player.velocity.x = -10
-    } else if (keys.player.d.pressed && player.lastKey == 'd') {
-        player.velocity.x = 10
-    }
+    // calc elapsed time since last loop
 
-    //P2 move
-    enemy.velocity.x = 0
-    if (keys.enemy.al.pressed && enemy.lastKey == 'al') {
-        enemy.velocity.x = -10
-    } else if (keys.enemy.ar.pressed && enemy.lastKey == 'ar') {
-        enemy.velocity.x = 10
-    }
+    now = Date.now();
+    elapsed = now - then;
 
-    // Collision p1
-    if (spriteCollision(player, enemy) && player.isAttacking) {
-        enemy.health -= 20
-        document.querySelector('#p2hp').style.width = enemy.health + '%'
-        player.isAttacking = false
-    }
-    // Collision p2
-    if (spriteCollision(enemy, player) && enemy.isAttacking) {
-        player.health -= 20
-        document.querySelector('#p1hp').style.width = player.health + '%'
-        enemy.isAttacking = false
-    }
+    // if enough time has elapsed, draw the next frame
 
-    // END GAME
-    if (player.health <= 0 || enemy.health <= 0) {
-        determineWinner({ player, enemy, timerId })
+    if (elapsed > fpsInterval) {
+
+        // Get ready for next frame by setting then=now, but also adjust for your
+        // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+        then = now - (elapsed % fpsInterval);
+
+        // Put your drawing code here
+        c.fillStyle = '#2b2b2b'
+        c.fillRect(0, 0, canvas.width, canvas.height)
+        player.update()
+        enemy.update()
+
+        //P1 move
+        player.velocity.x = 0
+        if (keys.player.a.pressed && player.lastKey == 'a') {
+            player.velocity.x = -10
+        } else if (keys.player.d.pressed && player.lastKey == 'd') {
+            player.velocity.x = 10
+        }
+
+        //P2 move
+        enemy.velocity.x = 0
+        if (keys.enemy.al.pressed && enemy.lastKey == 'al') {
+            enemy.velocity.x = -10
+        } else if (keys.enemy.ar.pressed && enemy.lastKey == 'ar') {
+            enemy.velocity.x = 10
+        }
+
+        // Collision p1
+        if (spriteCollision(player, enemy) && player.isAttacking) {
+            enemy.health -= 20
+            document.querySelector('#p2hp').style.width = enemy.health + '%'
+            player.isAttacking = false
+        }
+        // Collision p2
+        if (spriteCollision(enemy, player) && enemy.isAttacking) {
+            player.health -= 20
+            document.querySelector('#p1hp').style.width = player.health + '%'
+            enemy.isAttacking = false
+        }
+
+        // END GAME
+        if (player.health <= 0 || enemy.health <= 0) {
+            determineWinner({ player, enemy, timerId })
+        }
+
+        //FPS
+        var sinceStart = now - startTime;
+        document.querySelector('#fps').innerHTML = (Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100)+"fps";
     }
 
 }
 
-animate()
+startAnimating(60)
 decreaseTimer()
 
 window.addEventListener('keydown', (event) => {
