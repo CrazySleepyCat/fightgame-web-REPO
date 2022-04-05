@@ -1,3 +1,4 @@
+
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
 
@@ -7,6 +8,14 @@ canvas.height = 576
 c.fillRect(0, 0, canvas.width, canvas.height)
 
 const gravity = 0.8
+
+const background = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    imgSrc: "./assets/background.png"
+})
 
 const keys = {
     player: {
@@ -33,90 +42,7 @@ const keys = {
     }
 }
 
-class Sprite {
-    constructor({ position, velocity, color = '#ea3c53' }) {
-        this.position = position
-        this.velocity = velocity
-        this.color = color
-        this.height = 150
-        this.width = 50
-        this.lastKey = 'none'
-        this.isAttacking = false
-        this.direction = 'r'
-
-        this.attackBox = {
-            position: {
-                x: this.position.x,
-                y: this.position.y
-            },
-            width: 150,
-            height: 50,
-            leftOffset: 0
-        }
-        this.attackBox.leftOffset = -this.attackBox.width + this.width
-
-
-        this.health = 100
-    }
-
-    attack() {
-        this.isAttacking = true
-        setTimeout(() => {
-            this.isAttacking = false
-        }, 100)
-    }
-
-    draw() {
-        c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
-
-        if (this.isAttacking) {
-            c.fillStyle = '#59ea3c'
-            c.fillRect(this.attackBox.position.x, this.attackBox.position.y + 20, this.attackBox.width, this.attackBox.height)
-        }
-    }
-
-    update() {
-
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
-
-        if (this.position.x + this.width + this.velocity.x > canvas.width) {
-            this.position.x = canvas.width - this.width
-            this.velocity.x = 0
-        }
-        if (this.position.x + this.velocity.x < 0) {
-            this.position.x = 0
-            this.velocity.x = 0
-        }
-
-        if (this.position.y + this.height + this.velocity.y > canvas.height) {
-            this.position.y = canvas.height - this.height
-            this.velocity.y = 0
-        } else {
-            this.velocity.y += gravity
-        }
-
-        this.updateAttackBox()
-        this.draw()
-    }
-
-    updateAttackBox() {
-        switch (this.direction) {
-            case 'l':
-                this.attackBox.position.x = this.position.x + this.attackBox.leftOffset
-                this.attackBox.position.y = this.position.y
-                break;
-            case 'r':
-                this.attackBox.position.x = this.position.x
-                this.attackBox.position.y = this.position.y
-                break;
-        }
-    }
-
-}
-
-const player = new Sprite({
+const player = new Fighter({
     position: {
         x: 0,
         y: 0
@@ -126,7 +52,7 @@ const player = new Sprite({
         y: 0
     }
 })
-const enemy = new Sprite({
+const enemy = new Fighter({
     position: {
         x: 974,
         y: 0
@@ -184,12 +110,12 @@ var fps, fpsInterval, startTime, now, then, elapsed;
 
 function startAnimating(fps) {
     fpsInterval = 1000 / fps;
-    then = Date.now();
+    then = window.performance.now();
     startTime = then;
     animate();
 }
 
-function animate() {
+function animate(newtime) {
 
     // request another frame
 
@@ -197,7 +123,7 @@ function animate() {
 
     // calc elapsed time since last loop
 
-    now = Date.now();
+    now = newtime;
     elapsed = now - then;
 
     // if enough time has elapsed, draw the next frame
@@ -209,8 +135,7 @@ function animate() {
         then = now - (elapsed % fpsInterval);
 
         // Put your drawing code here
-        c.fillStyle = '#2b2b2b'
-        c.fillRect(0, 0, canvas.width, canvas.height)
+        background.update()
         player.update()
         enemy.update()
 
@@ -250,7 +175,7 @@ function animate() {
 
         //FPS
         var sinceStart = now - startTime;
-        document.querySelector('#fps').innerHTML = (Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100)+"fps";
+        document.querySelector('#fps').innerHTML = (Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100) + "fps";
     }
 
 }
