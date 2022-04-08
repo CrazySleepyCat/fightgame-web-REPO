@@ -1,18 +1,43 @@
 class Sprite {
-    constructor({ position, imgSrc }) {
+    constructor({ position, imgSrc, scale = 1, frames = 1 }) {
         this.position = position
-        this.height = 150
-        this.width = 50
         this.image = new Image()
         this.image.src = imgSrc
+        this.scale = scale
+        this.frames = frames
+        this.currentFrame = 1
 
     }
 
     draw() {
-        c.drawImage(this.image, this.position.x, this.position.y)
+        if (this.frames == 1) {
+            c.drawImage(
+                this.image,
+                this.position.x,
+                this.position.y,
+                this.image.width * this.scale,
+                this.image.height * this.scale
+            )
+        } else {
+            c.drawImage(
+                this.image,
+                this.image.width / this.frames * (this.currentFrame - 1),
+                0,
+                this.image.width / this.frames,
+                this.image.height,
+                this.position.x,
+                this.position.y,
+                this.image.width / this.frames * this.scale,
+                this.image.height * this.scale
+            )
+        }
+
     }
 
     update() {
+        if (++this.currentFrame > this.frames) {
+            this.currentFrame = 1
+        }
         this.draw()
     }
 

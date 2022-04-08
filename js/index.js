@@ -17,6 +17,16 @@ const background = new Sprite({
     imgSrc: "./assets/background.png"
 })
 
+const shop = new Sprite({
+    position: {
+        x: 620,
+        y: 225
+    },
+    imgSrc: "./assets/shop.png",
+    scale: 2,
+    frames: 6
+})
+
 const keys = {
     player: {
         a: {
@@ -136,6 +146,11 @@ function animate(newtime) {
 
         // Put your drawing code here
         background.update()
+        if (frameCount%2 == 0) {
+            shop.update()
+        } else {
+            shop.draw()
+        }
         player.update()
         enemy.update()
 
