@@ -1,11 +1,13 @@
 class Sprite {
-    constructor({ position, imgSrc, scale = 1, frames = 1 }) {
+    constructor({ position, imgSrc, scale = 1, frames = 1, frameHold = 1 }) {
         this.position = position
         this.image = new Image()
         this.image.src = imgSrc
         this.scale = scale
         this.frames = frames
-        this.currentFrame = 1
+        this.currentFrame = 0
+        this.framesElapsed = 0
+        this.framesHold = frameHold
 
     }
 
@@ -21,7 +23,7 @@ class Sprite {
         } else {
             c.drawImage(
                 this.image,
-                this.image.width / this.frames * (this.currentFrame - 1),
+                this.image.width / this.frames * this.currentFrame,
                 0,
                 this.image.width / this.frames,
                 this.image.height,
@@ -35,10 +37,11 @@ class Sprite {
     }
 
     update() {
-        if (++this.currentFrame > this.frames) {
-            this.currentFrame = 1
-        }
         this.draw()
+        this.framesElapsed = ++this.framesElapsed % this.framesHold
+        if (this.framesElapsed === 0){
+            this.currentFrame = ++this.currentFrame % this.frames
+        }
     }
 
 }
