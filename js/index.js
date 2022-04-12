@@ -25,7 +25,7 @@ const shop = new Sprite({
     imgSrc: "./assets/shop.png",
     scale: 2,
     frames: 6,
-    frameHold: 15
+    frameHold: 6
 })
 
 const keys = {
@@ -61,6 +61,14 @@ const player = new Fighter({
     velocity: {
         x: 0,
         y: 0
+    },
+    imgSrc: "./assets/samuraiMack/Idle.png",
+    scale: 2,
+    frames: 8,
+    frameHold: 6,
+    offset: {
+        x: 170,
+        y: 94
     }
 })
 const enemy = new Fighter({
@@ -72,7 +80,15 @@ const enemy = new Fighter({
         x: 0,
         y: 0
     },
-    color: '#3ceaa7'
+    color: '#3ceaa7',
+    imgSrc: "./assets/kenji/Idle.png",
+    scale: 2,
+    frames: 4,
+    frameHold: 6,
+    offset: {
+        x: 170,
+        y: 105
+    }
 })
 
 player.draw()

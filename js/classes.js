@@ -1,5 +1,5 @@
 class Sprite {
-    constructor({ position, imgSrc, scale = 1, frames = 1, frameHold = 1 }) {
+    constructor({ position, imgSrc, scale = 1, frames = 1, frameHold = 1, offset = { x: 0, y: 0 } }) {
         this.position = position
         this.image = new Image()
         this.image.src = imgSrc
@@ -8,6 +8,7 @@ class Sprite {
         this.currentFrame = 0
         this.framesElapsed = 0
         this.framesHold = frameHold
+        this.offset = offset
 
     }
 
@@ -27,8 +28,8 @@ class Sprite {
                 0,
                 this.image.width / this.frames,
                 this.image.height,
-                this.position.x,
-                this.position.y,
+                this.position.x - this.offset.x,
+                this.position.y - this.offset.y,
                 this.image.width / this.frames * this.scale,
                 this.image.height * this.scale
             )
@@ -39,16 +40,18 @@ class Sprite {
     update() {
         this.draw()
         this.framesElapsed = ++this.framesElapsed % this.framesHold
-        if (this.framesElapsed === 0){
+        if (this.framesElapsed === 0) {
             this.currentFrame = ++this.currentFrame % this.frames
         }
     }
 
 }
 
-class Fighter {
-    constructor({ position, velocity, color = '#ea3c53' }) {
-        this.position = position
+class Fighter extends Sprite {
+    constructor({ position, velocity, color = '#ea3c53', imgSrc, scale = 1, frames = 1, frameHold = 1, offset = { x: 0, y: 0 } }) {
+
+        super({ position, imgSrc, scale, frames, frameHold, offset })
+
         this.velocity = velocity
         this.color = color
         this.height = 150
@@ -74,19 +77,13 @@ class Fighter {
 
     attack() {
         this.isAttacking = true
+        /*this.image.src = './assets/samuraiMack/Attack1.png'
+        this.frames = 6
+        this.currentFrame = 0
+        this.framesElapsed = 0*/
         setTimeout(() => {
             this.isAttacking = false
-        }, 100)
-    }
-
-    draw() {
-        c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
-
-        if (this.isAttacking) {
-            c.fillStyle = '#59ea3c'
-            c.fillRect(this.attackBox.position.x, this.attackBox.position.y + 20, this.attackBox.width, this.attackBox.height)
-        }
+        }, 800)
     }
 
     update() {
@@ -111,10 +108,16 @@ class Fighter {
         }
 
         this.updateAttackBox()
-        this.draw()
+        super.update()
     }
 
     updateAttackBox() {
+        /*if (!this.isAttacking) {
+            this.image.src = './assets/samuraiMack/Idle.png'
+            this.frames = 8
+            this.currentFrame = 0
+            this.framesElapsed = 0
+        }*/
         switch (this.direction) {
             case 'l':
                 this.attackBox.position.x = this.position.x + this.attackBox.leftOffset
